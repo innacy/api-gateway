@@ -1,0 +1,10 @@
+redis:
+  image: redis:7-alpine
+  port: 6379
+  resources:
+    limits:
+      cpu: 250m
+      memory: 256Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi

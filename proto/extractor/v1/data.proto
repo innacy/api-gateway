@@ -1,0 +1,26 @@
+// proto/extractor/v1/data.proto
+syntax = "proto3";
+
+package extractor.v1;
+
+option go_package = "github.com/widasinnacy/api-gateway/gen/extractor/v1;extractorv1";
+
+import "extractor/v1/health.proto";
+
+message ParseRequest {
+  string content = 1;
+  string schema_hint = 2; // "json", "table", "key-value"
+  map<string, string> metadata = 3;
+}
+
+message ParseResponse {
+  string structured_data = 1; // JSON string
+  double confidence = 2;
+  string detected_schema = 3;
+  string request_id = 4;
+}
+
+service DataParser {
+  rpc Parse(ParseRequest) returns (ParseResponse);
+  rpc Health(HealthRequest) returns (HealthResponse);
+}

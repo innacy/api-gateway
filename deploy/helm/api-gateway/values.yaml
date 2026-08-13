@@ -1,0 +1,47 @@
+replicaCount: 2
+
+image:
+  repository: api-gateway
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8080
+
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: gateway.local
+      paths:
+        - path: /
+          pathType: Prefix
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+
+config:
+  redisURL: "redis://redis:6379"
+  jwtSecret: "change-in-production"
+  extractorURLAddr: "extractor-url:50051"
+  extractorDataAddr: "extractor-data:50052"
+  extractorMetaAddr: "extractor-meta:50053"
+  jaegerEndpoint: "http://jaeger:4318"
+  circuitBreakerTimeoutSec: "30"
+  circuitBreakerThreshold: "5"
+  retryMaxAttempts: "3"
+  retryBaseDelayMs: "100"
+  requestTimeoutSec: "5"
+  otelEnabled: "true"

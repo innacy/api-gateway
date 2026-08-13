@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-extractor-url
+  labels:
+    app: extractor-url
+spec:
+  replicas: {{ .Values.url.replicas }}
+  selector:
+    matchLabels:
+      app: extractor-url
+  template:
+    metadata:
+      labels:
+        app: extractor-url
+    spec:
+      containers:
+        - name: extractor-url
+          image: {{ .Values.url.image }}
+          ports:
+            - containerPort: {{ .Values.url.port }}
+          env:
+            - name: PORT
+              value: {{ .Values.url.port | quote }}
+            - name: FAILURE_RATE
+              value: {{ .Values.url.failureRate | quote }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}

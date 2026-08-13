@@ -1,0 +1,14 @@
+// proto/extractor/v1/health.proto
+syntax = "proto3";
+
+package extractor.v1;
+
+option go_package = "github.com/widasinnacy/api-gateway/gen/extractor/v1;extractorv1";
+
+message HealthRequest {}
+
+message HealthResponse {
+  string status = 1;
+  string service = 2;
+  int64 uptime_seconds = 3;
+}

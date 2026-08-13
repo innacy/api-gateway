@@ -1,0 +1,85 @@
+# deploy/docker-compose.yml
+version: "3.8"
+
+services:
+  gateway:
+    build:
+      context: ..
+      dockerfile: deploy/docker/gateway.Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=demo-secret-change-me
+      - EXTRACTOR_URL_ADDR=extractor-url:50051
+      - EXTRACTOR_DATA_ADDR=extractor-data:50052
+      - EXTRACTOR_META_ADDR=extractor-meta:50053
+      - JAEGER_ENDPOINT=http://jaeger:4318
+      - OTEL_ENABLED=true
+    depends_on:
+      - redis
+      - extractor-url
+      - extractor-data
+      - extractor-meta
+      - jaeger
+
+  extractor-url:
+    build:
+      context: ..
+      dockerfile: deploy/docker/extractor-url.Dockerfile
+    environment:
+      - PORT=50051
+      - FAILURE_RATE=0.05
+
+  extractor-data:
+    build:
+      context: ..
+      dockerfile: deploy/docker/extractor-data.Dockerfile
+    environment:
+      - PORT=50052
+      - FAILURE_RATE=0.05
+
+  extractor-meta:
+    build:
+      context: ..
+      dockerfile: deploy/docker/extractor-meta.Dockerfile
+    environment:
+      - PORT=50053
+      - FAILURE_RATE=0.05
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  prometheus:
+    image: prom/prometheus:v2.50.0
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - gateway
+
+  grafana:
+    image: grafana/grafana:10.3.1
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    depends_on:
+      - prometheus
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.54
+    ports:
+      - "16686:16686"
+      - "4318:4318"
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true

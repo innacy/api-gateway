@@ -1,0 +1,31 @@
+// proto/extractor/v1/url.proto
+syntax = "proto3";
+
+package extractor.v1;
+
+option go_package = "github.com/widasinnacy/api-gateway/gen/extractor/v1;extractorv1";
+
+import "extractor/v1/health.proto";
+
+message URLRequest {
+  string url = 1;
+  bool include_links = 2;
+  bool include_images = 3;
+  int32 max_depth = 4;
+  map<string, string> metadata = 5;
+}
+
+message URLResponse {
+  string title = 1;
+  string content = 2;
+  repeated string links = 3;
+  repeated string images = 4;
+  int32 word_count = 5;
+  string language = 6;
+  string request_id = 7;
+}
+
+service URLExtractor {
+  rpc Extract(URLRequest) returns (URLResponse);
+  rpc Health(HealthRequest) returns (HealthResponse);
+}

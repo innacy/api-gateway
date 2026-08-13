@@ -1,0 +1,6 @@
+.superpowers/
+bin/
+gateway
+extractor-url
+extractor-data
+extractor-meta

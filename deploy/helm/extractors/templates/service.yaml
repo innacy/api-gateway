@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: extractor-url
+spec:
+  selector:
+    app: extractor-url
+  ports:
+    - port: {{ .Values.url.port }}
+      targetPort: {{ .Values.url.port }}
+      protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: extractor-data
+spec:
+  selector:
+    app: extractor-data
+  ports:
+    - port: {{ .Values.data.port }}
+      targetPort: {{ .Values.data.port }}
+      protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: extractor-meta
+spec:
+  selector:
+    app: extractor-meta
+  ports:
+    - port: {{ .Values.meta.port }}
+      targetPort: {{ .Values.meta.port }}
+      protocol: TCP

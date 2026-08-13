@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-config
+data:
+  PORT: "8080"
+  REDIS_URL: {{ .Values.config.redisURL | quote }}
+  JWT_SECRET: {{ .Values.config.jwtSecret | quote }}
+  EXTRACTOR_URL_ADDR: {{ .Values.config.extractorURLAddr | quote }}
+  EXTRACTOR_DATA_ADDR: {{ .Values.config.extractorDataAddr | quote }}
+  EXTRACTOR_META_ADDR: {{ .Values.config.extractorMetaAddr | quote }}
+  CIRCUIT_BREAKER_TIMEOUT_SEC: {{ .Values.config.circuitBreakerTimeoutSec | quote }}
+  CIRCUIT_BREAKER_THRESHOLD: {{ .Values.config.circuitBreakerThreshold | quote }}
+  RETRY_MAX_ATTEMPTS: {{ .Values.config.retryMaxAttempts | quote }}
+  RETRY_BASE_DELAY_MS: {{ .Values.config.retryBaseDelayMs | quote }}
+  REQUEST_TIMEOUT_SEC: {{ .Values.config.requestTimeoutSec | quote }}
+  JAEGER_ENDPOINT: {{ .Values.config.jaegerEndpoint | quote }}
+  OTEL_ENABLED: {{ .Values.config.otelEnabled | quote }}

@@ -1,0 +1,35 @@
+// proto/extractor/v1/meta.proto
+syntax = "proto3";
+
+package extractor.v1;
+
+option go_package = "github.com/widasinnacy/api-gateway/gen/extractor/v1;extractorv1";
+
+import "extractor/v1/health.proto";
+
+message MetaRequest {
+  string url = 1;
+  string raw_content = 2;
+  repeated string metadata_types = 3; // "opengraph", "schema_org", "headers", "dns"
+  map<string, string> metadata = 4;
+}
+
+message MetaResponse {
+  map<string, string> opengraph = 1;
+  map<string, string> schema_org = 2;
+  map<string, string> http_headers = 3;
+  DNSInfo dns = 4;
+  string request_id = 5;
+}
+
+message DNSInfo {
+  repeated string a_records = 1;
+  repeated string cname_records = 2;
+  repeated string mx_records = 3;
+  string ttl = 4;
+}
+
+service MetadataExtractor {
+  rpc GetMetadata(MetaRequest) returns (MetaResponse);
+  rpc Health(HealthRequest) returns (HealthResponse);
+}
