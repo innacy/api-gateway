@@ -3,6 +3,7 @@
 
 PROTO_DIR := proto
 GEN_DIR := gen
+K6 := $(shell command -v k6 2>/dev/null || echo $(HOME)/go/bin/k6)
 
 proto:
 	cd $(PROTO_DIR) && buf generate
@@ -26,7 +27,7 @@ clean:
 	rm -rf bin/ gen/
 
 loadtest:
-	k6 run --env BASE_URL=http://localhost:8080 loadtest/gateway.js
+	$(K6) run --env BASE_URL=http://localhost:8080 loadtest/gateway.js
 
 loadtest-quick:
-	k6 run --duration 30s --vus 50 --env BASE_URL=http://localhost:8080 loadtest/gateway.js
+	$(K6) run --duration 30s --vus 50 --env BASE_URL=http://localhost:8080 loadtest/gateway.js

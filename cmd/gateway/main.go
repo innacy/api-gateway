@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"errors"
 	"log"
+	"net/http"
 	"os/signal"
 	"strings"
 	"syscall"
@@ -11,6 +13,7 @@ import (
 	"github.com/widasinnacy/api-gateway/internal/gateway/config"
 	"github.com/widasinnacy/api-gateway/internal/gateway/middleware"
 	"github.com/widasinnacy/api-gateway/internal/pkg/redis"
+	"github.com/widasinnacy/api-gateway/internal/pkg/telemetry"
 )
 
 type redisKeyStore struct {
@@ -44,6 +47,15 @@ func main() {
 		log.Fatalf("failed to load config: %v", err)
 	}
 
+	if cfg.OTelEnabled {
+		shutdown, err := telemetry.InitTracer("api-gateway", cfg.JaegerEndpoint)
+		if err != nil {
+			log.Printf("warning: failed to init tracer: %v", err)
+		} else {
+			defer shutdown(context.Background())
+		}
+	}
+
 	rdb, err := redis.NewClient(cfg.RedisURL)
 	if err != nil {
 		log.Fatalf("failed to connect to redis: %v", err)
@@ -61,7 +73,8 @@ func main() {
 	srv := gateway.NewWithDeps(cfg, deps)
 	log.Printf("starting gateway on :%d", cfg.Port)
 
-	if err := srv.Start(ctx); err != nil {
+	if err := srv.Start(ctx); err != nil && !errors.Is(err, http.ErrServerClosed) {
 		log.Fatalf("server error: %v", err)
 	}
+	log.Println("gateway stopped")
 }

@@ -49,6 +49,7 @@ func (a *AuthMiddleware) Authenticate(next http.Handler) http.Handler {
 				return
 			}
 			ctx = withAuthContext(ctx, data.TenantID, data.Tier, data.Scopes)
+			SetRequestMeta(ctx, data.Tier)
 			next.ServeHTTP(w, r.WithContext(ctx))
 			return
 		}
@@ -83,6 +84,7 @@ func (a *AuthMiddleware) Authenticate(next http.Handler) http.Handler {
 		scopes := extractScopes(claims["scopes"])
 
 		ctx = withAuthContext(ctx, tenantID, "jwt", scopes)
+		SetRequestMeta(ctx, "jwt")
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

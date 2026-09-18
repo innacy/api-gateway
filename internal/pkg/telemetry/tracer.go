@@ -2,6 +2,7 @@ package telemetry
 
 import (
 	"context"
+	"strings"
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
@@ -19,8 +20,13 @@ func InitTracer(serviceName, endpoint string) (func(context.Context) error, erro
 		return tp.Shutdown, nil
 	}
 
+	// WithEndpoint expects host:port without scheme
+	cleanEndpoint := endpoint
+	cleanEndpoint = strings.TrimPrefix(cleanEndpoint, "http://")
+	cleanEndpoint = strings.TrimPrefix(cleanEndpoint, "https://")
+
 	exporter, err := otlptracehttp.New(context.Background(),
-		otlptracehttp.WithEndpoint(endpoint),
+		otlptracehttp.WithEndpoint(cleanEndpoint),
 		otlptracehttp.WithInsecure(),
 	)
 	if err != nil {
